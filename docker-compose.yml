@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  #DATABASE
+  db:
+    container_name: wp1x_db
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: U7hh9PLjPo
+      MYSQL_DATABASE: wp1x_wordpress
+      MYSQL_USER: wp1x
+      MYSQL_PASSWORD: U7hh9PLjPo
+    volumes:
+      - db_data:/var/lib/mysql
+    networks: 
+      - wp1xwordpress
+  #PHPMYADMIN
+  phpmyadmin:
+    container_name: wp1x_phpmyadmin
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8081:80'
+    environment: 
+      PMA_PORT: db
+      MYSQL_ROOT_PASSWORD: U7hh9PLjPo
+    networks: 
+      - wp1xwordpress
+  #WORDPRESS
+  wordpress:
+    container_name: wp1x_wp
+    depends_on:
+      - db
+    image: wordpress:latest
+    restart: always
+    ports:
+      - "8080:80"
+    volumes: ['./:/var/www/html']
+    links:
+      - db:mysql
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp1x
+      WORDPRESS_DB_PASSWORD: U7hh9PLjPo
+      WORDPRESS_DB_NAME: wp1x_wordpress
+    networks: 
+      - wp1xwordpress
+
+networks:
+  wp1xwordpress:
+volumes:
+  db_data:
